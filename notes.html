@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nomad Notes</title>
+    <title>Nomad Notes // Workspace</title>
     <style>
         :root {
             --bg-cream: #faf6f0;
             --paper-white: #ffffff;
             --moss-green: #4a5d4e;
-            --sage: #8f9f8f;
+            --sage: #c27355;
             --terracotta: #d98a6c;
             --charcoal: #2d332f;
             --organic-radius-1: 30px 15px 40px 20px;
             --organic-radius-2: 20px 40px 25px 35px;
             --hand-font: 'Georgia', serif;
+            --line-height: 28px;
         }
 
         * {
@@ -27,419 +28,1066 @@
             font-family: var(--hand-font);
             background-color: var(--bg-cream);
             color: var(--charcoal);
-            min-height: 100vh;
-            padding: 2rem 1rem;
-            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
             background-image: 
                 radial-gradient(var(--sage) 0.5px, transparent 0.5px), 
                 radial-gradient(var(--sage) 0.5px, var(--bg-cream) 0.5px);
             background-size: 40px 40px;
             background-position: 0 0, 20px 20px;
+            overflow: hidden;
+            transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
+        /* --- MODE SWITCH ACCENTS (SHARED) --- */
+        .mode-toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(74, 93, 78, 0.05);
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px dashed var(--sage);
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 3rem;
-            position: relative;
-        }
-
-        header h1 {
-            font-size: 3.5rem;
-            font-weight: 400;
-            color: var(--moss-green);
+        .mode-label {
+            font-size: 0.85rem;
             font-style: italic;
-            letter-spacing: -1px;
-            display: inline-block;
-            position: relative;
+            font-weight: bold;
+            color: var(--moss-green);
         }
 
-        header h1::after {
-            content: "";
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
             position: absolute;
-            bottom: -5px;
-            left: 10%;
-            width: 80%;
-            height: 2px;
-            background: var(--terracotta);
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--sage);
+            transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 22px;
+        }
+
+        .slider::before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 50%;
         }
 
-        .subtitle {
-            font-size: 1rem;
-            color: var(--sage);
-            margin-top: 0.5rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+        input:checked + .slider {
+            background-color: var(--terracotta);
         }
 
-        /* Layout Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2.5rem;
+        input:checked + .slider::before {
+            transform: translateX(22px);
         }
 
-        @media (min-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 0.8fr 1.2fr;
-            }
-        }
-
-        .panel {
-            background: var(--paper-white);
-            padding: 2.5rem;
-            box-shadow: 0 12px 32px rgba(74, 93, 78, 0.06);
-            border: 2px solid var(--moss-green);
-            transition: transform 0.3s ease;
+        /* Formatting Toolbar */
+        .toolbar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 0.75rem;
             position: relative;
-            height: max-content;
+            z-index: 5;
         }
 
-        .panel-composer {
-            border-radius: var(--organic-radius-1);
+        .btn-tool {
+            font-family: var(--hand-font);
+            font-size: 0.85rem;
+            padding: 0.2rem 0.6rem;
+            background: var(--paper-white);
+            border: 1px solid var(--moss-green);
+            color: var(--moss-green);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+        .btn-tool:hover {
+            background: var(--bg-cream);
+        }
+        .btn-tool.bold-indicator { font-weight: bold; }
+        .btn-tool.italic-indicator { font-style: italic; }
+        .btn-tool.underline-indicator { text-decoration: underline; }
+
+        .btn-tool.active {
+            background: var(--terracotta) !important;
+            color: #ffffff !important;
+            border-color: var(--terracotta) !important;
         }
 
-        .panel-stream {
-            border-radius: var(--organic-radius-2);
+        /* --- CONTAINER BASE STRUCTURE --- */
+        .app-container {
+            display: grid;
+            width: 100%;
+            margin: 0 auto;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .panel:hover {
-            transform: scale(1.005) rotate(0.2deg);
+        .sidebar-panel {
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        h2 {
+        .workspace-panel {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-title-text {
             font-weight: 400;
             font-style: italic;
-            color: var(--moss-green);
-            margin-bottom: 1.5rem;
-            font-size: 1.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        button.btn-add {
+            font-family: var(--hand-font);
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            user-select: none;
+            width: 100%;
+        }
+
+        /* Sidebar Action Panel Triggers */
+        .sidebar-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        button.btn-action-io {
+            font-family: var(--hand-font);
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0.5rem;
+            background: transparent;
+            user-select: none;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .list-container {
+            list-style: none;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .item-page {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            cursor: pointer;
+            font-style: italic;
+            transition: all 0.2s ease;
         }
 
-        /* Form Controls */
-        .input-group {
+        .text-truncate {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-remove {
+            background: none;
+            border: none;
+            color: var(--sage);
+            cursor: pointer;
+        }
+
+        .title-container {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        input.title-input {
+            flex: 1;
+            font-family: var(--hand-font);
+            font-style: italic;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-weight: 400;
+        }
+
+        .btn-export-single {
+            font-family: var(--hand-font);
+            font-size: 0.85rem;
+            color: var(--sage);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-style: italic;
+            text-decoration: underline;
+            white-space: nowrap;
+        }
+        .btn-export-single:hover {
+            color: var(--terracotta);
+        }
+
+        .scrolling-paper-frame {
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        div.rich-editor-canvas {
+            width: 100%;
+            height: 100%;
+            font-family: var(--hand-font);
+            color: var(--charcoal);
+            background: transparent;
+            border: none;
+            outline: none;
+            padding-top: 2px;
+            background-image: linear-gradient(rgba(143, 159, 143, 0.25) 1px, transparent 1px);
+            background-size: 100% var(--line-height);
+            white-space: pre-wrap;
+        }
+
+        /* --- THEMED CUSTOM POPUP MODAL DIALOGS --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(45, 51, 47, 0.45);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.modal-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: var(--paper-white);
+            border: 2px solid var(--moss-green);
+            padding: 2rem;
+            width: 100%;
+            max-width: 460px;
+            text-align: center;
+            box-shadow: 0 16px 40px rgba(74, 93, 78, 0.12);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: scale(0.92);
+        }
+
+        .modal-overlay.modal-visible .modal-box {
+            transform: scale(1);
+        }
+
+        body:not(.binder-mode-active) .modal-box {
+            border-radius: var(--organic-radius-1);
+        }
+
+        body.binder-mode-active .modal-box {
+            border-radius: 12px;
+            box-shadow: 8px 8px 0px var(--moss-green);
+            border-width: 3px;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            color: var(--moss-green);
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .modal-desc {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--charcoal);
             margin-bottom: 1.5rem;
         }
 
-        input[type="text"], textarea, select {
-            width: 100%;
-            padding: 0.8rem 1.2rem;
-            border: 2px solid var(--sage);
-            border-radius: 20px 10px 20px 15px;
+        .modal-btn-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .modal-btn {
             font-family: var(--hand-font);
-            font-size: 1rem;
-            background: transparent;
-            color: var(--charcoal);
-            outline: none;
-            transition: border-color 0.2s ease;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 120px;
-            border-radius: 15px 25px 15px 20px;
-        }
-
-        select {
-            appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path fill='%234a5d4e' d='M0 3l5 5 5-5z'/></svg>");
-            background-repeat: no-repeat;
-            background-position: right 1.2rem center;
-            border-radius: 12px 20px 12px 15px;
-            cursor: pointer;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            border-color: var(--terracotta);
-        }
-
-        button {
-            font-family: var(--hand-font);
-            cursor: pointer;
-            padding: 0.8rem 1.5rem;
-            border: 2px solid var(--moss-green);
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--moss-green);
             background: var(--paper-white);
             color: var(--moss-green);
+            cursor: pointer;
             font-weight: bold;
-            font-size: 1rem;
-            border-radius: 12px 25px 12px 20px;
+            font-size: 0.9rem;
             transition: all 0.2s ease;
-            user-select: none;
         }
 
-        button:hover {
-            background: var(--moss-green);
-            color: var(--paper-white);
-            transform: translateY(-2px);
+        .modal-btn:hover {
+            background: var(--bg-cream);
         }
 
-        .btn-action {
+        .modal-btn.btn-primary-action {
             background: var(--terracotta);
             color: white;
             border-color: var(--terracotta);
-            width: 100%;
         }
-        .btn-action:hover {
+        .modal-btn.btn-primary-action:hover {
             background: #c27355;
             border-color: #c27355;
         }
 
-        /* Filter Pills */
-        .filter-row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px dashed var(--sage);
+        body:not(.binder-mode-active) .modal-btn {
+            border-radius: 8px 16px 8px 14px;
+        }
+        body.binder-mode-active .modal-btn {
+            border-radius: 6px;
+            border: 2px solid var(--moss-green);
         }
 
-        .pill {
-            padding: 0.3rem 0.8rem;
-            font-size: 0.85rem;
-            border: 1px solid var(--sage);
-            border-radius: 15px 8px 12px 10px;
-            cursor: pointer;
-            background: transparent;
-            color: var(--charcoal);
-            transition: all 0.2s ease;
-        }
-        .pill.active, .pill:hover {
-            background: var(--moss-green);
-            color: white;
-            border-color: var(--moss-green);
+        /* --- DESIGN STYLE 1: ORIGINAL JOURNAL MODE (ORANGE ACCENTS RESTORED) --- */
+        body:not(.binder-mode-active) {
+            padding: 1.5rem;
         }
 
-        /* Notes Notebook Stream */
-        .notes-stream {
-            display: flex;
-            flex-direction: column;
+        body:not(.binder-mode-active) .app-container {
+            grid-template-columns: 280px 1fr;
             gap: 1.5rem;
+            flex: 1;
+            max-width: 1400px;
+            height: calc(100vh - 3rem);
         }
 
-        .note-card {
-            padding: 1.5rem 0;
-            border-bottom: 1px dashed var(--sage);
-            animation: growIn 0.4s ease;
-            position: relative;
-        }
-
-        .note-card:last-child {
-            border-bottom: none;
-        }
-
-        .note-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.5rem;
-        }
-
-        .note-title {
-            font-size: 1.3rem;
-            font-weight: 400;
-            color: var(--moss-green);
-            font-style: italic;
-        }
-
-        .note-meta {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .vibe-tag {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            background: var(--bg-cream);
-            padding: 0.2rem 0.6rem;
-            border-radius: 8px 4px 8px 4px;
-            color: var(--moss-green);
-            border: 1px solid var(--sage);
-        }
-
-        .note-body {
-            font-size: 1.05rem;
-            line-height: 1.6;
-            color: var(--charcoal);
-            white-space: pre-wrap;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
+        body:not(.binder-mode-active) .sidebar-panel {
+            background: var(--paper-white);
+            border: 2px solid var(--moss-green);
+            box-shadow: 0 12px 32px rgba(74, 93, 78, 0.06);
+            border-radius: var(--organic-radius-1);
+            padding: 1.5rem;
             overflow: hidden;
-            cursor: pointer;
         }
 
-        .note-body.expanded {
-            display: block;
-            overflow: visible;
-            -webkit-line-clamp: unset;
+        body:not(.binder-mode-active) .sidebar-title-text {
+            font-size: 1.8rem;
+            color: var(--moss-green);
+            margin-bottom: 1.5rem;
         }
 
-        .btn-delete-note {
-            border: none;
-            background: none;
-            color: var(--sage);
-            font-size: 1.1rem;
-            padding: 0 0.5rem;
-        }
-        .btn-delete-note:hover {
-            color: var(--terracotta);
-            background: none;
-            transform: none;
+        body:not(.binder-mode-active) button.btn-add {
+            background: var(--terracotta);
+            color: white;
+            border-color: var(--terracotta);
+            padding: 0.6rem 1.2rem;
+            border: 2px solid var(--terracotta);
+            font-size: 0.95rem;
+            border-radius: 12px 25px 12px 20px;
+            margin-bottom: 1rem;
         }
 
-        .empty-state {
+        body:not(.binder-mode-active) button.btn-add:hover {
+            background: #c27355;
+            border-color: #c27355;
+            transform: translateY(-1px);
+        }
+
+        body:not(.binder-mode-active) button.btn-action-io {
+            color: var(--moss-green);
+            border: 1px dashed var(--moss-green);
+            border-radius: 8px;
+        }
+        body:not(.binder-mode-active) button.btn-action-io:hover {
+            background: var(--bg-cream);
+        }
+
+        body:not(.binder-mode-active) .list-container {
+            padding-right: 0.25rem;
+        }
+
+        body:not(.binder-mode-active) .item-page {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 10px 18px 10px 14px;
+            border: 1px solid transparent;
+        }
+
+        body:not(.binder-mode-active) .item-page:hover {
+            background: var(--bg-cream);
+        }
+
+        body:not(.binder-mode-active) .item-page.active {
+            background: var(--bg-cream);
+            border-color: var(--sage);
+        }
+
+        body:not(.binder-mode-active) .text-truncate {
+            font-size: 1.05rem;
+            color: var(--charcoal);
+            max-width: 180px;
+        }
+
+        body:not(.binder-mode-active) .btn-remove {
+            font-size: 1rem;
+            padding: 0 0.25rem;
+        }
+        body:not(.binder-mode-active) .btn-remove:hover { color: var(--terracotta); }
+
+        body:not(.binder-mode-active) .workspace-panel {
+            background: var(--paper-white);
+            border: 2px solid var(--moss-green);
+            box-shadow: 0 12px 32px rgba(74, 93, 78, 0.06);
+            border-radius: var(--organic-radius-2);
+            padding: 3rem 2.5rem 2.5rem 4rem;
+        }
+
+        body:not(.binder-mode-active) .workspace-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 3.2rem;
+            bottom: 0;
+            width: 1px;
+            background: rgba(217, 138, 108, 0.4);
+        }
+
+        body:not(.binder-mode-active) input.title-input {
+            font-size: 2.2rem;
+            color: var(--moss-green);
+            padding-bottom: 0.5rem;
+        }
+
+        body:not(.binder-mode-active) div.rich-editor-canvas {
+            font-size: 16px;
+        }
+
+
+        /* --- DESIGN STYLE 2: BINDER MODE OVERRIDES --- */
+        body.binder-mode-active {
+            padding: 2rem;
+        }
+
+        body.binder-mode-active .app-container {
+            grid-template-columns: 260px 1fr;
+            max-width: 1300px;
+            background: var(--paper-white);
+            border: 3px solid var(--moss-green);
+            border-radius: 16px;
+            box-shadow: 12px 12px 0px var(--moss-green);
+            height: calc(100vh - 4rem);
+            overflow: hidden;
+        }
+
+        body.binder-mode-active .sidebar-panel {
+            background: #fdfbf7;
+            border-right: 3px solid var(--moss-green);
+            padding: 1.5rem;
+            overflow: hidden;
+        }
+
+        body.binder-mode-active .sidebar-title-text {
+            font-size: 1.6rem;
+            color: var(--moss-green);
+            margin-bottom: 1.5rem;
             text-align: center;
-            color: var(--sage);
-            font-style: italic;
-            padding: 2rem 0;
         }
 
-        @keyframes growIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
+        body.binder-mode-active button.btn-add {
+            background: var(--terracotta);
+            color: white;
+            border: 2px solid var(--moss-green);
+            padding: 0.6rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 3px 3px 0px var(--moss-green);
         }
+
+        body.binder-mode-active button.btn-add:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0px var(--moss-green);
+        }
+
+        body.binder-mode-active button.btn-add:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--moss-green);
+        }
+
+        body.binder-mode-active button.btn-action-io {
+            color: var(--moss-green);
+            border: 2px solid var(--moss-green);
+            border-radius: 6px;
+            font-weight: bold;
+            box-shadow: 2px 2px 0px var(--moss-green);
+            background: var(--paper-white);
+        }
+        body.binder-mode-active button.btn-action-io:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px var(--moss-green);
+        }
+        body.binder-mode-active button.btn-action-io:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px var(--moss-green);
+        }
+
+        body.binder-mode-active .item-page {
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px dashed var(--sage);
+        }
+
+        body.binder-mode-active .item-page:hover, body.binder-mode-active .item-page.active {
+            color: var(--terracotta);
+            font-weight: bold;
+        }
+
+        body.binder-mode-active .text-truncate {
+            max-width: 160px;
+        }
+
+        body.binder-mode-active .btn-remove {
+            font-size: 0.9rem;
+        }
+        body.binder-mode-active .btn-remove:hover { color: red; }
+
+        body.binder-mode-active .workspace-panel {
+            padding: 2rem 2rem 2rem 4.5rem;
+            background-color: var(--paper-white);
+        }
+
+        body.binder-mode-active .workspace-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 3.5rem;
+            bottom: 0;
+            width: 2px;
+            background: rgba(217, 138, 108, 0.6);
+        }
+
+        body.binder-mode-active input.title-input {
+            font-size: 2.2rem;
+            color: var(--moss-green);
+        }
+
+        body.binder-mode-active div.rich-editor-canvas {
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            body:not(.binder-mode-active) .app-container, body.binder-mode-active .app-container {
+                grid-template-columns: 1fr;
+                height: auto;
+                overflow: auto;
+            }
+            body { overflow: auto; height: auto; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--sage); border-radius: 4px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <h1>Nomad Notes</h1>
-            <div class="subtitle" style="padding-top:8px;">Capture your thoughts and current vibes</div>
-        </header>
+    <div class="app-container">
+        <aside class="sidebar-panel">
+            <h1 class="sidebar-title-text" id="dynamic-title">Notebook</h1>
+            
+            <div class="mode-toggle-container">
+                <span class="mode-label">Binder Mode</span>
+                <label class="switch">
+                    <input type="checkbox" id="mode-switch">
+                    <span class="slider"></span>
+                </label>
+            </div>
 
-        <main class="dashboard-grid">
-            <section class="panel panel-composer">
-                <h2>Write</h2>
-                <div class="input-group">
-                    <input type="text" id="note-title" placeholder="Title your thought..." autocomplete="off">
-                    <textarea id="note-body" placeholder="What's on your mind?"></textarea>
-                    <select id="note-vibe">
-                        <option value="calm">Calm Vibe</option>
-                        <option value="productive">Productive Vibe</option>
-                        <option value="wandering">Wandering Vibe</option>
-                        <option value="heavy">Heavy Vibe</option>
-                    </select>
-                </div>
-                <button class="btn-action" id="save-note-btn">Save Entry</button>
-            </section>
+            <button class="btn-add" id="add-page-btn">+ New Page</button>
+            <ul class="list-container" id="page-list-wrapper"></ul>
+            
+            <div class="sidebar-actions">
+                <button class="btn-action-io" id="import-btn">📂 Import JSON</button>
+                <button class="btn-action-io" id="export-all-btn">⬇ Export Entire Notebook</button>
+            </div>
+            <input type="file" id="file-picker" accept=".json" style="display: none;">
+        </aside>
 
-            <section class="panel panel-stream">
-                <h2>Notebook</h2>
-                
-                <div class="filter-row" id="filter-container">
-                    <button class="pill active" data-filter="all">All Thoughts</button>
-                    <button class="pill" data-filter="calm">Calm</button>
-                    <button class="pill" data-filter="productive">Productive</button>
-                    <button class="pill" data-filter="wandering">Wandering</button>
-                    <button class="pill" data-filter="heavy">Heavy</button>
-                </div>
-
-                <div class="notes-stream" id="notes-wrapper">
-                    </div>
-            </section>
+        <main class="workspace-panel" id="editor-panel" style="display: none;">
+            <div class="toolbar">
+                <button class="btn-tool bold-indicator" id="btn-bold" title="Toggle Bold (Ctrl/Cmd+B)">B</button>
+                <button class="btn-tool italic-indicator" id="btn-italic" title="Toggle Italic (Ctrl/Cmd+I)">I</button>
+                <button class="btn-tool underline-indicator" id="btn-underline" title="Toggle Underline (Ctrl/Cmd+U)">U</button>
+            </div>
+            <div class="title-container">
+                <input type="text" id="editor-title" class="title-input" placeholder="Untitled Page" autocomplete="off">
+                <button class="btn-export-single" id="export-single-btn" title="Export this entry as a JSON file">Export JSON</button>
+            </div>
+            <div class="scrolling-paper-frame">
+                <div id="editor-body" class="rich-editor-canvas" contenteditable="true" role="textbox" aria-multiline="true"></div>
+            </div>
         </main>
     </div>
 
+    <div class="modal-overlay" id="custom-modal">
+        <div class="modal-box">
+            <h3 class="modal-title" id="modal-title-text">Import Notes</h3>
+            <p class="modal-desc" id="modal-desc-text">Select how you want to read this file entry.</p>
+            <div class="modal-btn-stack" id="modal-actions-container"></div>
+        </div>
+    </div>
+
     <script>
-        let notes = JSON.parse(localStorage.getItem('nomad_notes')) || [];
-        let currentFilter = 'all';
+        let journalPages = JSON.parse(localStorage.getItem('nomad_journal_pages')) || [];
+        let activePageId = localStorage.getItem('nomad_active_page_id') || null;
+        let isBinderMode = JSON.parse(localStorage.getItem('nomad_binder_mode_active')) || false;
 
-        const noteTitle = document.getElementById('note-title');
-        const noteBody = document.getElementById('note-body');
-        const noteVibe = document.getElementById('note-vibe');
-        const saveNoteBtn = document.getElementById('save-note-btn');
-        const notesWrapper = document.getElementById('notes-wrapper');
-        const filterContainer = document.getElementById('filter-container');
+        const pageListWrapper = document.getElementById('page-list-wrapper');
+        const editorPanel = document.getElementById('editor-panel');
+        const editorTitle = document.getElementById('editor-title');
+        const editorBody = document.getElementById('editor-body');
+        const addPageBtn = document.getElementById('add-page-btn');
+        const modeSwitch = document.getElementById('mode-switch');
+        const dynamicTitle = document.getElementById('dynamic-title');
+        const exportAllBtn = document.getElementById('export-all-btn');
+        const exportSingleBtn = document.getElementById('export-single-btn');
+        const importBtn = document.getElementById('import-btn');
+        const filePicker = document.getElementById('file-picker');
 
-        function renderNotes() {
-            localStorage.setItem('nomad_notes', JSON.stringify(notes));
-            notesWrapper.innerHTML = '';
+        const customModal = document.getElementById('custom-modal');
+        const modalTitleText = document.getElementById('modal-title-text');
+        const modalDescText = document.getElementById('modal-desc-text');
+        const modalActionsContainer = document.getElementById('modal-actions-container');
+        
+        const btnBold = document.getElementById('btn-bold');
+        const btnItalic = document.getElementById('btn-italic');
+        const btnUnderline = document.getElementById('btn-underline');
 
-            const filteredNotes = notes.filter(note => currentFilter === 'all' || note.vibe === currentFilter);
+        // Dynamic Format Highlighting Logic
+        function updateButtonHighlights() {
+            if (document.activeElement !== editorBody) return;
 
-            if (filteredNotes.length === 0) {
-                notesWrapper.innerHTML = `<div class="empty-state">This part of the notebook is completely open...</div>`;
+            if (document.queryCommandState('bold')) {
+                btnBold.classList.add('active');
+            } else {
+                btnBold.classList.remove('active');
+            }
+
+            if (document.queryCommandState('italic')) {
+                btnItalic.classList.add('active');
+            } else {
+                btnItalic.classList.remove('active');
+            }
+
+            if (document.queryCommandState('underline')) {
+                btnUnderline.classList.add('active');
+            } else {
+                btnUnderline.classList.remove('active');
+            }
+        }
+
+        document.addEventListener('selectionchange', updateButtonHighlights);
+
+        // Toolbar Button Triggers
+        btnBold.addEventListener('click', () => {
+            document.execCommand('bold', false, null);
+            editorBody.focus();
+            updateButtonHighlights();
+        });
+        btnItalic.addEventListener('click', () => {
+            document.execCommand('italic', false, null);
+            editorBody.focus();
+            updateButtonHighlights();
+        });
+        btnUnderline.addEventListener('click', () => {
+            document.execCommand('underline', false, null);
+            editorBody.focus();
+            updateButtonHighlights();
+        });
+
+        // Shortcuts & Custom Indentation Logic
+        editorBody.addEventListener('keydown', (e) => {
+            const isModifierPressed = e.ctrlKey || e.metaKey;
+
+            if (isModifierPressed) {
+                const key = e.key.toLowerCase();
+                if (key === 'b') {
+                    e.preventDefault();
+                    document.execCommand('bold', false, null);
+                    updateButtonHighlights();
+                } else if (key === 'i') {
+                    e.preventDefault();
+                    document.execCommand('italic', false, null);
+                    updateButtonHighlights();
+                } else if (key === 'u') {
+                    e.preventDefault();
+                    document.execCommand('underline', false, null);
+                    updateButtonHighlights();
+                }
+            }
+
+            if (e.key === 'Tab') {
+                e.preventDefault(); 
+                
+                const selection = window.getSelection();
+                if (!selection.rangeCount) return;
+
+                const range = selection.getRangeAt(0);
+                const tabNode = document.createTextNode('    ');
+                
+                range.insertNode(tabNode);
+                range.setStartAfter(tabNode);
+                range.setEndAfter(tabNode);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                
+                handleLiveTyping();
+            }
+        });
+
+        // Themed Modular Popup Framework UI Engines
+        function triggerCustomPopup(title, description, buttonsConfigArray) {
+            modalTitleText.textContent = title;
+            modalDescText.textContent = description;
+            modalActionsContainer.innerHTML = '';
+
+            buttonsConfigArray.forEach(btnConfig => {
+                const btnElement = document.createElement('button');
+                btnElement.textContent = btnConfig.label;
+                btnElement.className = `modal-btn ${btnConfig.isPrimary ? 'btn-primary-action' : ''}`;
+                
+                btnElement.addEventListener('click', () => {
+                    closeCustomPopup();
+                    if(btnConfig.actionCallback) btnConfig.actionCallback();
+                });
+                modalActionsContainer.appendChild(btnElement);
+            });
+
+            customModal.classList.add('modal-visible');
+        }
+
+        function closeCustomPopup() {
+            customModal.classList.remove('modal-visible');
+        }
+
+        // Downloader Action Engine
+        function downloadDataAsJSON(dataObj, preferredFilename) {
+            const parsedDataString = JSON.stringify(dataObj, null, 4);
+            const dataBlob = new Blob([parsedDataString], { type: 'application/json' });
+            const temporaryAnchor = document.createElement('a');
+            
+            temporaryAnchor.href = URL.createObjectURL(dataBlob);
+            temporaryAnchor.download = preferredFilename.endsWith('.json') ? preferredFilename : `${preferredFilename}.json`;
+            
+            document.body.appendChild(temporaryAnchor);
+            temporaryAnchor.click();
+            document.body.removeChild(temporaryAnchor);
+            URL.revokeObjectURL(temporaryAnchor.href);
+        }
+
+        // Single Entry Export Handler
+        exportSingleBtn.addEventListener('click', () => {
+            const currentActivePage = journalPages.find(p => p.id === activePageId);
+            if (!currentActivePage) return;
+
+            const rawTitle = currentActivePage.title.trim() || 'Untitled Page';
+            const cleanFilename = rawTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'untitled-entry';
+            
+            downloadDataAsJSON(currentActivePage, `nomad-note-${cleanFilename}.json`);
+        });
+
+        // Global Notebook Array Export Handler
+        exportAllBtn.addEventListener('click', () => {
+            if (journalPages.length === 0) {
+                triggerCustomPopup(
+                    "Notebook Empty", 
+                    "There are no pages available in your directory path to perform a data export.", 
+                    [{ label: "Understood", isPrimary: true }]
+                );
+                return;
+            }
+            downloadDataAsJSON(journalPages, 'nomad-notebook-export.json');
+        });
+
+        // Import Actions Process Engine Interceptor Rules
+        importBtn.addEventListener('click', () => {
+            filePicker.value = ''; 
+            filePicker.click();
+        });
+
+        filePicker.addEventListener('change', (event) => {
+            const selectedFile = event.target.files[0];
+            if (!selectedFile) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const extractedData = JSON.parse(e.target.result);
+                    
+                    const isNotebookDataStructure = Array.isArray(extractedData);
+                    const isSingleNoteDataStructure = (!isNotebookDataStructure && extractedData && typeof extractedData === 'object' && 'id' in extractedData && 'body' in extractedData && 'title' in extractedData);
+
+                    if (isSingleNoteDataStructure) {
+                        const processedNoteInstance = {
+                            id: 'page_' + Date.now(),
+                            title: extractedData.title || '',
+                            body: extractedData.body || ''
+                        };
+                        journalPages.push(processedNoteInstance);
+                        activePageId = processedNoteInstance.id;
+                        
+                        save();
+                        renderSidebar();
+                        loadActivePage();
+                    } 
+                    else if (isNotebookDataStructure) {
+                        const totalValidEntriesCount = extractedData.filter(item => item && typeof item === 'object' && 'body' in item && 'title' in item).length;
+                        
+                        if (totalValidEntriesCount === 0 && extractedData.length > 0) {
+                            throw new Error("Invalid structure layout parsing payload validation parameters.");
+                        }
+
+                        triggerCustomPopup(
+                            "Import Notebook",
+                            `This file contains ${extractedData.length} page workspace metrics data entries. Would you like to wipe out your existing environment history or append them to your current entries?`,
+                            [
+                                {
+                                    label: "Append & Keep Existing Data",
+                                    isPrimary: true,
+                                    actionCallback: () => {
+                                        extractedData.forEach(importedItem => {
+                                            journalPages.push({
+                                                id: 'page_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                                                title: importedItem.title || '',
+                                                body: importedItem.body || ''
+                                            });
+                                        });
+                                        if (extractedData.length > 0) {
+                                            activePageId = journalPages[journalPages.length - extractedData.length].id;
+                                        }
+                                        save();
+                                        renderSidebar();
+                                        loadActivePage();
+                                    }
+                                },
+                                {
+                                    label: "Clear Notebook & Overwrite Entirely",
+                                    isPrimary: false,
+                                    actionCallback: () => {
+                                        journalPages = [];
+                                        extractedData.forEach(importedItem => {
+                                            journalPages.push({
+                                                id: 'page_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                                                title: importedItem.title || '',
+                                                body: importedItem.body || ''
+                                            });
+                                        });
+                                        activePageId = journalPages.length > 0 ? journalPages[0].id : null;
+                                        save();
+                                        renderSidebar();
+                                        loadActivePage();
+                                    }
+                                },
+                                {
+                                    label: "Cancel Operations",
+                                    isPrimary: false
+                                }
+                            ]
+                        );
+                    } 
+                    else {
+                        throw new Error("Unrecognized asset schema layout payload variables mismatch error.");
+                    }
+
+                } catch (err) {
+                    triggerCustomPopup(
+                        "Import Error",
+                        "The selected file is not a valid Nomad Notes JSON layout architecture structure template format configuration script profile.",
+                        [{ label: "Close Error Diagnostic Display Window", isPrimary: true }]
+                    );
+                }
+            };
+            reader.readAsText(selectedFile);
+        });
+
+        function save() {
+            localStorage.setItem('nomad_journal_pages', JSON.stringify(journalPages));
+            localStorage.setItem('nomad_active_page_id', activePageId);
+            localStorage.setItem('nomad_binder_mode_active', JSON.stringify(isBinderMode));
+        }
+
+        function applyVisualThemeStyle() {
+            if (isBinderMode) {
+                document.body.classList.add('binder-mode-active');
+                dynamicTitle.textContent = "Nomad Binder";
+                modeSwitch.checked = true;
+            } else {
+                document.body.classList.remove('binder-mode-active');
+                dynamicTitle.textContent = "Notebook";
+                modeSwitch.checked = false;
+            }
+        }
+
+        function renderSidebar() {
+            pageListWrapper.innerHTML = '';
+            
+            if (journalPages.length === 0) {
+                editorPanel.style.display = 'none';
                 return;
             }
 
-            // Show newest notes first
-            filteredNotes.slice().reverse().forEach((note) => {
-                // Find original index to maintain accurate deletion targets
-                const originalIndex = notes.indexOf(note); 
+            journalPages.forEach(page => {
+                const li = document.createElement('li');
+                li.className = `item-page ${page.id === activePageId ? 'active' : ''}`;
+                li.setAttribute('data-id', page.id);
+                
+                let cleanPreview = page.title || page.body.replace(/<[^>]*>/g, '').substring(0, 15) || 'Untitled Page';
+                if(page.title) cleanPreview = page.title;
 
-                const div = document.createElement('div');
-                div.className = 'note-card';
-                div.innerHTML = `
-                    <div class="note-header">
-                        <span class="note-title">${cleanHTML(note.title || 'Untitled Thought')}</span>
-                        <div class="note-meta">
-                            <span class="vibe-tag">${note.vibe}</span>
-                            <button class="btn-delete-note" data-id="${originalIndex}">✕</button>
-                        </div>
-                    </div>
-                    <div class="note-body" onclick="this.classList.toggle('expanded')" title="Click to unfold thought">${cleanHTML(note.body)}</div>
+                li.innerHTML = `
+                    <span class="text-truncate" data-id="${page.id}">${escapeHTML(cleanPreview)}</span>
+                    <button class="btn-remove" data-id="${page.id}">✕</button>
                 `;
-                notesWrapper.appendChild(div);
+                pageListWrapper.appendChild(li);
             });
         }
 
-        function saveNote() {
-            const title = noteTitle.value.trim();
-            const body = noteBody.value.trim();
-            const vibe = noteVibe.value;
-
-            if (!body) {
-                alert("Please write something down before saving.");
-                return;
+        function loadActivePage() {
+            const activePage = journalPages.find(p => p.id === activePageId);
+            if (activePage) {
+                editorPanel.style.display = 'flex';
+                editorTitle.value = activePage.title;
+                editorBody.innerHTML = activePage.body;
+            } else {
+                editorPanel.style.display = 'none';
             }
-
-            notes.push({ title, body, vibe });
-            
-            // Reset input values
-            noteTitle.value = '';
-            noteBody.value = '';
-            noteVibe.value = 'calm';
-
-            renderNotes();
         }
 
-        // Handle deletions and handling filter selections
-        notesWrapper.addEventListener('click', (e) => {
-            if (e.target.classList.contains('btn-delete-note')) {
-                const id = e.target.dataset.id;
-                notes.splice(id, 1);
-                renderNotes();
+        function createPage() {
+            const newId = 'page_' + Date.now();
+            const newPage = {
+                id: newId,
+                title: '',
+                body: ''
+            };
+            journalPages.push(newPage);
+            activePageId = newId;
+            
+            save();
+            renderSidebar();
+            loadActivePage();
+            editorTitle.focus();
+        }
+
+        function handleLiveTyping() {
+            const activePage = journalPages.find(p => p.id === activePageId);
+            if (activePage) {
+                activePage.title = editorTitle.value;
+                activePage.body = editorBody.innerHTML;
+                save();
+                
+                const matchItem = document.querySelector(`.item-page[data-id="${activePageId}"] .text-truncate`);
+                if (matchItem) {
+                    matchItem.textContent = editorTitle.value || editorBody.textContent.substring(0, 15) || 'Untitled Page';
+                }
+            }
+        }
+
+        pageListWrapper.addEventListener('click', (e) => {
+            const targetId = e.target.dataset.id;
+            if (!targetId) return;
+
+            if (e.target.classList.contains('btn-remove')) {
+                e.stopPropagation();
+                
+                const targetPage = journalPages.find(p => p.id === targetId);
+                const displayTitle = (targetPage && targetPage.title.trim()) ? targetPage.title : 'Untitled Page';
+
+                // Trigger custom pop-up validation for deleting a note
+                triggerCustomPopup(
+                    "Delete Page",
+                    `Are you sure you want to permanently delete "${displayTitle}"? This action cannot be undone.`,
+                    [
+                        {
+                            label: "Delete Permanently",
+                            isPrimary: true,
+                            actionCallback: () => {
+                                journalPages = journalPages.filter(p => p.id !== targetId);
+                                
+                                if (activePageId === targetId) {
+                                    activePageId = journalPages.length > 0 ? journalPages[0].id : null;
+                                }
+                                
+                                save();
+                                renderSidebar();
+                                loadActivePage();
+                            }
+                        },
+                        {
+                            label: "Keep Note",
+                            isPrimary: false
+                        }
+                    ]
+                );
+            } else {
+                activePageId = targetId;
+                save();
+                renderSidebar();
+                loadActivePage();
             }
         });
 
-        filterContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('pill')) {
-                document.querySelectorAll('.filter-row .pill').forEach(btn => btn.classList.remove('active'));
-                e.target.classList.add('active');
-                currentFilter = e.target.dataset.filter;
-                renderNotes();
-            }
+        modeSwitch.addEventListener('change', (e) => {
+            isBinderMode = e.target.checked;
+            save();
+            applyVisualThemeStyle();
         });
 
-        saveNoteBtn.addEventListener('click', saveNote);
-        function cleanHTML(str) { return str.replace(/[&<>'"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m])); }
+        addPageBtn.addEventListener('click', createPage);
+        editorTitle.addEventListener('input', handleLiveTyping);
+        editorBody.addEventListener('input', handleLiveTyping);
 
-        // Initial paint
-        renderNotes();
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+        }
+
+        applyVisualThemeStyle();
+        if (journalPages.length > 0) {
+            if (!activePageId || !journalPages.some(p => p.id === activePageId)) {
+                activePageId = journalPages[0].id;
+            }
+            renderSidebar();
+            loadActivePage();
+        } else {
+            createPage();
+        }
     </script>
 </body>
 </html>
