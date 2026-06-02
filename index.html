@@ -6,15 +6,15 @@
     <title>Nomad Dashboard</title>
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            --panel-bg: rgba(30, 41, 59, 0.7);
-            --panel-border: rgba(255, 255, 255, 0.08);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-primary: #6366f1;
-            --accent-success: #10b981;
-            --accent-danger: #ef4444;
-            --font-sans: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --bg-cream: #faf6f0;
+            --paper-white: #ffffff;
+            --moss-green: #4a5d4e;
+            --sage: #8f9f8f;
+            --terracotta: #d98a6c;
+            --charcoal: #2d332f;
+            --organic-radius-1: 30px 15px 40px 20px;
+            --organic-radius-2: 20px 40px 25px 35px;
+            --hand-font: 'Georgia', serif;
         }
 
         * {
@@ -24,439 +24,455 @@
         }
 
         body {
-            font-family: var(--font-sans);
-            background: var(--bg-gradient);
-            color: var(--text-main);
+            font-family: var(--hand-font);
+            background-color: var(--bg-cream);
+            color: var(--charcoal);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
+            padding: 2rem 1rem;
+            position: relative;
+            background-image: 
+                radial-gradient(var(--sage) 0.5px, transparent 0.5px), 
+                radial-gradient(var(--sage) 0.5px, var(--bg-cream) 0.5px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
         }
 
-        /* App Layout */
-        header {
-            padding: 1.5rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--panel-border);
-            backdrop-filter: blur(10px);
+        /* Whimsical Botanical Accent Elements */
+        body::before {
+            content: "✿";
+            position: fixed;
+            bottom: 20px;
+            left: 30px;
+            font-size: 5rem;
+            color: rgba(143, 159, 143, 0.15);
+            pointer-events: none;
         }
 
-        header h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.05em;
-            background: linear-gradient(to right, #fff, var(--text-muted));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        #live-clock {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--text-muted);
-        }
-
-        main {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            padding: 2rem;
-            max-width: 1400px;
-            width: 100%;
+        /* App Wrapper */
+        .container {
+            max-width: 1000px;
             margin: 0 auto;
         }
 
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            font-weight: 400;
+            color: var(--moss-green);
+            font-style: italic;
+            letter-spacing: -1px;
+            display: inline-block;
+            position: relative;
+        }
+
+        header h1::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background: var(--terracotta);
+            border-radius: 50%; /* Makes it look hand-drawn */
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--sage);
+            margin-top: 0.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+        }
+
         @media (min-width: 768px) {
-            main {
-                grid-template-columns: 1.2fr 0.8fr;
+            .dashboard-grid {
+                grid-template-columns: 1.1fr 0.9fr;
             }
         }
 
-        /* Shared Glass Panel Style */
-        .glass-panel {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        /* Organic Scrapbook Panels */
+        .panel {
+            background: var(--paper-white);
+            padding: 2.5rem;
+            box-shadow: 0 12px 32px rgba(74, 93, 78, 0.06);
+            border: 2px solid var(--moss-green);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .panel-tasks {
+            border-radius: var(--organic-radius-1);
+        }
+
+        .panel-timer {
+            border-radius: var(--organic-radius-2);
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .panel:hover {
+            transform: scale(1.01) rotate(0.5deg);
         }
 
         h2 {
-            font-size: 1.2rem;
-            margin-bottom: 1.25rem;
-            color: var(--text-main);
-            font-weight: 600;
+            font-weight: 400;
+            font-style: italic;
+            color: var(--moss-green);
+            margin-bottom: 1.5rem;
+            font-size: 1.75rem;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
         }
 
-        /* Inputs & Buttons */
+        /* Hand-sketched Inputs & Buttons */
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
         input[type="text"] {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--panel-border);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border: 2px solid var(--sage);
+            border-radius: 20px 10px 20px 15px;
+            font-family: var(--hand-font);
+            font-size: 1rem;
+            background: transparent;
+            color: var(--charcoal);
             outline: none;
         }
 
         input[type="text"]:focus {
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            border-color: var(--terracotta);
         }
 
         button {
+            font-family: var(--hand-font);
             cursor: pointer;
-            padding: 0.75rem 1.2rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95rem;
+            padding: 0.8rem 1.5rem;
+            border: 2px solid var(--moss-green);
+            background: var(--paper-white);
+            color: var(--moss-green);
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 12px 25px 12px 20px;
             transition: all 0.2s ease;
         }
 
-        button.btn-primary {
-            background: var(--accent-primary);
-            color: #fff;
+        button:hover {
+            background: var(--moss-green);
+            color: var(--paper-white);
+            transform: translateY(-2px);
         }
 
-        button.btn-primary:hover {
-            background: #4f46e5;
-            transform: translateY(-1px);
+        .btn-action {
+            background: var(--terracotta);
+            color: white;
+            border-color: var(--terracotta);
+        }
+        .btn-action:hover {
+            background: #c27355;
+            border-color: #c27355;
         }
 
-        /* Task Manager Section */
-        .task-input-group {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.25rem;
-        }
-
+        /* Organic Task List */
         .task-list {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-            max-height: 450px;
-            overflow-y: auto;
-            padding-right: 0.25rem;
-        }
-
-        .task-list::-webkit-scrollbar {
-            width: 6px;
-        }
-        .task-list::-webkit-scrollbar-thumb {
-            background: var(--panel-border);
-            border-radius: 4px;
+            gap: 1rem;
         }
 
         .task-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.85rem 1rem;
-            background: rgba(15, 23, 42, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            border-radius: 10px;
-            animation: fadeIn 0.3s ease forwards;
-        }
-
-        .task-item.completed .task-text {
-            text-decoration: line-through;
-            color: var(--text-muted);
+            padding: 0.75rem 0;
+            border-bottom: 1px dashed var(--sage);
+            animation: growIn 0.4s ease;
         }
 
         .task-left {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 1rem;
         }
 
-        .task-checkbox {
+        /* Custom Leaf-like Checkbox */
+        .custom-checkbox {
             appearance: none;
-            width: 1.15rem;
-            height: 1.15rem;
-            border: 2px solid var(--text-muted);
-            border-radius: 4px;
+            width: 1.4rem;
+            height: 1.4rem;
+            border: 2px solid var(--moss-green);
+            border-radius: 50% 0 50% 0; /* Leaf Shape! */
             cursor: pointer;
+            transition: all 0.2s ease;
             display: grid;
             place-content: center;
-            transition: 0.2s all;
         }
 
-        .task-checkbox:checked {
-            background: var(--accent-success);
-            border-color: var(--accent-success);
+        .custom-checkbox:checked {
+            background: var(--moss-green);
+            transform: rotate(45deg);
         }
 
-        .task-checkbox:checked::before {
-            content: "✓";
-            color: white;
-            font-size: 0.8rem;
-            font-weight: bold;
+        .task-text {
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
         }
 
-        .btn-delete {
-            background: transparent;
-            color: var(--text-muted);
-            padding: 0.25rem 0.5rem;
+        .completed .task-text {
+            color: var(--sage);
+            text-decoration: line-through;
+            font-style: italic;
         }
 
-        .btn-delete:hover {
-            color: var(--accent-danger);
+        .btn-clear {
+            border: none;
+            background: none;
+            color: var(--sage);
+            font-size: 1.2rem;
+            padding: 0 0.5rem;
+        }
+        .btn-clear:hover {
+            color: var(--terracotta);
+            background: none;
+            transform: none;
         }
 
-        /* Pomodoro Timer Section */
-        .timer-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            padding: 1rem 0;
-        }
-
-        .timer-display {
+        /* The Sundial / Bloom Timer */
+        .timer-wrapper {
             position: relative;
-            width: 200px;
-            height: 200px;
+            width: 240px;
+            height: 240px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .timer-svg {
             position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
             transform: rotate(-90deg);
         }
 
-        .timer-circle-bg {
+        .timer-bg {
             fill: none;
-            stroke: rgba(255, 255, 255, 0.05);
-            stroke-width: 8;
+            stroke: var(--bg-cream);
+            stroke-width: 6;
         }
 
-        .timer-circle-progress {
+        .timer-progress {
             fill: none;
-            stroke: var(--accent-primary);
-            stroke-width: 8;
+            stroke: var(--terracotta);
+            stroke-width: 6;
             stroke-linecap: round;
-            stroke-dasharray: 565.48; /* 2 * PI * r (where r dynamically scales or is hardcoded) */
+            stroke-dasharray: 628; /* 2 * PI * 100 */
             stroke-dashoffset: 0;
             transition: stroke-dashoffset 1s linear;
         }
 
-        .time-text {
-            font-size: 2.5rem;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-            letter-spacing: -1px;
+        .time-display {
+            font-size: 3rem;
+            color: var(--moss-green);
+            font-weight: 300;
+            z-index: 2;
         }
 
         .timer-controls {
             display: flex;
-            gap: 1rem;
+            gap: 12px;
         }
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text-main);
+        #growth-stage {
+            font-size: 0.9rem;
+            color: var(--sage);
+            margin-top: 1rem;
+            font-style: italic;
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes growIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Nomad</h1>
-        <div id="live-clock">00:00:00 AM</div>
-    </header>
+    <div class="container">
+        <header>
+            <h1>Nomad</h1>
+            <div class="subtitle">Grow through the day</div>
+        </header>
 
-    <main>
-        <section class="glass-panel">
-            <h2>Focus Tasks <span id="task-counter" style="font-size: 0.9rem; color: var(--text-muted);">0 completed</span></h2>
-            <div class="task-input-group">
-                <input type="text" id="task-input" placeholder="What will you accomplish next?" autocomplete="off">
-                <button class="btn-primary" id="add-task-btn">Add</button>
-            </div>
-            <ul class="task-list" id="task-list">
-                </ul>
-        </section>
+        <main class="dashboard-grid">
+            <section class="panel panel-tasks">
+                <h2>The Daily Harvest <span id="counter" style="font-size: 1rem; color: var(--sage);">0 done</span></h2>
+                
+                <div class="input-wrapper">
+                    <input type="text" id="task-input" placeholder="Plant a new task..." autocomplete="off">
+                    <button id="add-btn">Plant</button>
+                </div>
 
-        <section class="glass-panel">
-            <h2>Focus Session</h2>
-            <div class="timer-container">
-                <div class="timer-display">
-                    <svg class="timer-svg" viewBox="0 0 200 200">
-                        <circle class="timer-circle-bg" cx="100" cy="100" r="90"></circle>
-                        <circle class="timer-circle-progress" id="progress-bar" cx="100" cy="100" r="90"></circle>
+                <ul class="task-list" id="task-list">
+                    </ul>
+            </section>
+
+            <section class="panel panel-timer">
+                <h2>Focus Bloom</h2>
+                <div class="timer-wrapper">
+                    <svg class="timer-svg" viewBox="0 0 220 220">
+                        <circle class="timer-bg" cx="110" cy="110" r="100"></circle>
+                        <circle class="timer-progress" id="timer-ring" cx="110" cy="110" r="100"></circle>
                     </svg>
-                    <span class="time-text" id="timer-countdown">25:00</span>
+                    <div class="time-display" id="time-string">25:00</div>
                 </div>
+
                 <div class="timer-controls">
-                    <button class="btn-primary" id="timer-toggle">Start</button>
-                    <button class="btn-secondary" id="timer-reset">Reset</button>
+                    <button class="btn-action" id="toggle-timer">Begin</button>
+                    <button id="reset-timer">Reset</button>
                 </div>
-            </div>
-        </section>
-    </main>
+                <div id="growth-stage">The soil is ready.</div>
+            </section>
+        </main>
+    </div>
 
     <script>
-        // --- LIVE CLOCK MODULE ---
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('live-clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-
-        // --- TASK MANAGER MODULE ---
-        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-
+        // --- TASKS ARCHITECTURE ---
+        let tasks = JSON.parse(localStorage.getItem('nomad_tasks')) || [];
         const taskInput = document.getElementById('task-input');
-        const addTaskBtn = document.getElementById('add-task-btn');
+        const addBtn = document.getElementById('add-btn');
         const taskList = document.getElementById('task-list');
-        const taskCounter = document.getElementById('task-counter');
+        const counter = document.getElementById('counter');
 
-        function saveAndRenderTasks() {
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+        function render() {
+            localStorage.setItem('nomad_tasks', JSON.stringify(tasks));
             taskList.innerHTML = '';
             
-            tasks.forEach((task, index) => {
+            tasks.forEach((task, idx) => {
                 const li = document.createElement('li');
-                li.className = `task-item ${task.completed ? 'completed' : ''}`;
-                
+                li.className = `task-item ${task.done ? 'completed' : ''}`;
                 li.innerHTML = `
                     <div class="task-left">
-                        <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} data-index="${index}">
-                        <span class="task-text">${escapeHTML(task.text)}</span>
+                        <input type="checkbox" class="custom-checkbox" ${task.done ? 'checked' : ''} data-id="${idx}">
+                        <span class="task-text">${cleanHTML(task.text)}</span>
                     </div>
-                    <button class="btn-delete" data-index="${index}">✕</button>
+                    <button class="btn-clear" data-id="${idx}">✕</button>
                 `;
                 taskList.appendChild(li);
             });
-
-            const completedCount = tasks.filter(t => t.completed).length;
-            taskCounter.textContent = `${completedCount} of ${tasks.length} completed`;
+            const doneCount = tasks.filter(t => t.done).length;
+            counter.textContent = `${doneCount} plucked`;
         }
 
         function addTask() {
-            const text = taskInput.value.trim();
-            if (text) {
-                tasks.push({ text, completed: false });
+            const val = taskInput.value.trim();
+            if(val) {
+                tasks.push({ text: val, done: false });
                 taskInput.value = '';
-                saveAndRenderTasks();
+                render();
             }
         }
 
         taskList.addEventListener('click', (e) => {
-            const index = e.target.dataset.index;
-            if (e.target.classList.contains('task-checkbox')) {
-                tasks[index].completed = e.target.checked;
-                saveAndRenderTasks();
-            } else if (e.target.classList.contains('btn-delete')) {
-                tasks.splice(index, 1);
-                saveAndRenderTasks();
+            const id = e.target.dataset.id;
+            if(!id) return;
+            if(e.target.classList.contains('custom-checkbox')) {
+                tasks[id].done = e.target.checked;
+                render();
+            } else if (e.target.classList.contains('btn-clear')) {
+                tasks.splice(id, 1);
+                render();
             }
         });
 
-        addTaskBtn.addEventListener('click', addTask);
-        taskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTask(); });
+        addBtn.addEventListener('click', addTask);
+        taskInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') addTask(); });
+        function cleanHTML(str) { return str.replace(/[&<>'"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m])); }
 
-        function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, 
-                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-            );
-        }
-
-
-        // --- POMODORO TIMER MODULE ---
-        let timerInterval = null;
-        let isRunning = false;
-        const defaultWorkTime = 25 * 60; 
-        let timeLeft = defaultWorkTime;
-
-        const timerCountdown = document.getElementById('timer-countdown');
-        const timerToggle = document.getElementById('timer-toggle');
-        const timerReset = document.getElementById('timer-reset');
-        const progressBar = document.getElementById('progress-bar');
+        // --- BOTANICAL TIMER ARCHITECTURE ---
+        let duration = 25 * 60;
+        let timeRemaining = duration;
+        let clockInterval = null;
+        const ring = document.getElementById('timer-ring');
+        const timeString = document.getElementById('time-string');
+        const toggleTimerBtn = document.getElementById('toggle-timer');
+        const resetTimerBtn = document.getElementById('reset-timer');
+        const growthStage = document.getElementById('growth-stage');
         
-        const radius = 90;
-        const circumference = 2 * Math.PI * radius;
+        const circumference = 2 * Math.PI * 100;
 
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerCountdown.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        function updateClockDisplay() {
+            const mins = Math.floor(timeRemaining / 60);
+            const secs = timeRemaining % 60;
+            timeString.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
             
-            // Progress Ring logic
-            const progress = (defaultWorkTime - timeLeft) / defaultWorkTime;
-            const offset = circumference - (progress * circumference);
-            progressBar.style.strokeDashoffset = offset;
+            const offset = circumference - ((duration - timeRemaining) / duration * circumference);
+            ring.style.strokeDashoffset = offset;
+
+            // Whimsical text changes based on session progress
+            const pct = (timeRemaining / duration) * 100;
+            if (pct === 100) growthStage.textContent = "The soil is ready.";
+            else if (pct > 75) growthStage.textContent = "A seed breaks open...";
+            else if (pct > 40) growthStage.textContent = "Sprouting upward into the light.";
+            else if (pct > 5) growthStage.textContent = "Leaves are forming smoothly.";
+            else growthStage.textContent = "Almost ready to bloom!";
         }
 
-        function toggleTimer() {
-            if (isRunning) {
-                clearInterval(timerInterval);
-                timerToggle.textContent = 'Start';
-                timerToggle.style.background = 'var(--accent-primary)';
+        function toggleClock() {
+            if(clockInterval) {
+                clearInterval(clockInterval);
+                clockInterval = null;
+                toggleTimerBtn.textContent = 'Resume';
             } else {
-                timerInterval = setInterval(() => {
-                    if (timeLeft > 0) {
-                        timeLeft--;
-                        updateTimerDisplay();
+                toggleTimerBtn.textContent = 'Pause';
+                clockInterval = setInterval(() => {
+                    if(timeRemaining > 0) {
+                        timeRemaining--;
+                        updateClockDisplay();
                     } else {
-                        clearInterval(timerInterval);
-                        alert('Session finished! Time to take a breather.');
-                        resetTimer();
+                        clearInterval(clockInterval);
+                        clockInterval = null;
+                        growthStage.textContent = "Fully bloomed! Take a restful break.";
+                        alert("Your focus session has bloomed into a beautiful flower. Time to rest.");
+                        resetClock();
                     }
                 }, 1000);
-                timerToggle.textContent = 'Pause';
-                timerToggle.style.background = 'var(--accent-danger)';
             }
-            isRunning = !isRunning;
         }
 
-        function resetTimer() {
-            clearInterval(timerInterval);
-            isRunning = false;
-            timeLeft = defaultWorkTime;
-            timerToggle.textContent = 'Start';
-            timerToggle.style.background = 'var(--accent-primary)';
-            updateTimerDisplay();
+        function resetClock() {
+            clearInterval(clockInterval);
+            clockInterval = null;
+            timeRemaining = duration;
+            toggleTimerBtn.textContent = 'Begin';
+            updateClockDisplay();
         }
 
-        timerToggle.addEventListener('click', toggleTimer);
-        timerReset.addEventListener('click', resetTimer);
+        toggleTimerBtn.addEventListener('click', toggleClock);
+        resetTimerBtn.addEventListener('click', resetClock);
 
-
-        // Initial Load Run
-        saveAndRenderTasks();
-        updateTimerDisplay();
+        // Init
+        render();
+        updateClockDisplay();
     </script>
 </body>
 </html>
