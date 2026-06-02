@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nomad Dashboard</title>
     <style>
+        html {
+            overflow: hidden;
+        }
         :root {
             --bg-cream: #faf6f0;
             --paper-white: #ffffff;
@@ -37,18 +40,6 @@
             background-position: 0 0, 20px 20px;
         }
 
-        /* Whimsical Botanical Accent Elements */
-        body::before {
-            content: "✿";
-            position: fixed;
-            bottom: 20px;
-            left: 30px;
-            font-size: 5rem;
-            color: rgba(143, 159, 143, 0.15);
-            pointer-events: none;
-        }
-
-        /* App Wrapper */
         .container {
             max-width: 1000px;
             margin: 0 auto;
@@ -78,7 +69,7 @@
             width: 80%;
             height: 2px;
             background: var(--terracotta);
-            border-radius: 50%; /* Makes it look hand-drawn */
+            border-radius: 50%;
         }
 
         .subtitle {
@@ -89,7 +80,6 @@
             text-transform: uppercase;
         }
 
-        /* Grid Layout */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -102,7 +92,6 @@
             }
         }
 
-        /* Organic Scrapbook Panels */
         .panel {
             background: var(--paper-white);
             padding: 2.5rem;
@@ -139,7 +128,6 @@
             align-items: center;
         }
 
-        /* Hand-sketched Inputs & Buttons */
         .input-wrapper {
             display: flex;
             gap: 10px;
@@ -173,6 +161,7 @@
             font-size: 1rem;
             border-radius: 12px 25px 12px 20px;
             transition: all 0.2s ease;
+            user-select: none;
         }
 
         button:hover {
@@ -191,7 +180,27 @@
             border-color: #c27355;
         }
 
-        /* Organic Task List */
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            border-radius: 8px 15px 8px 12px;
+        }
+
+        .btn-text {
+            border: none;
+            background: none;
+            color: var(--sage);
+            font-size: 0.85rem;
+            text-decoration: underline;
+            padding: 0.2rem 0.5rem;
+            font-style: italic;
+        }
+        .btn-text:hover {
+            color: var(--terracotta);
+            background: none;
+            transform: none;
+        }
+
         .task-list {
             list-style: none;
             display: flex;
@@ -214,13 +223,12 @@
             gap: 1rem;
         }
 
-        /* Custom Leaf-like Checkbox */
         .custom-checkbox {
             appearance: none;
             width: 1.4rem;
             height: 1.4rem;
             border: 2px solid var(--moss-green);
-            border-radius: 50% 0 50% 0; /* Leaf Shape! */
+            border-radius: 50% 0 50% 0;
             cursor: pointer;
             transition: all 0.2s ease;
             display: grid;
@@ -256,7 +264,6 @@
             transform: none;
         }
 
-        /* The Sundial / Bloom Timer */
         .timer-wrapper {
             position: relative;
             width: 240px;
@@ -264,7 +271,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .timer-svg {
@@ -285,7 +292,7 @@
             stroke: var(--terracotta);
             stroke-width: 6;
             stroke-linecap: round;
-            stroke-dasharray: 628; /* 2 * PI * 100 */
+            stroke-dasharray: 628;
             stroke-dashoffset: 0;
             transition: stroke-dashoffset 1s linear;
         }
@@ -299,14 +306,17 @@
 
         .timer-controls {
             display: flex;
-            gap: 12px;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
         }
 
-        #growth-stage {
-            font-size: 0.9rem;
-            color: var(--sage);
-            margin-top: 1rem;
-            font-style: italic;
+        .control-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
         }
 
         @keyframes growIn {
@@ -320,24 +330,23 @@
     <div class="container">
         <header>
             <h1>Nomad</h1>
-            <div class="subtitle">Grow through the day</div>
+            <div class="subtitle" style="padding-top:8px;">Manage your time and tasks</div>
         </header>
 
         <main class="dashboard-grid">
             <section class="panel panel-tasks">
-                <h2>The Daily Harvest <span id="counter" style="font-size: 1rem; color: var(--sage);">0 done</span></h2>
+                <h2>Tasks<span id="counter" style="font-size: 1rem; color: var(--sage);">0 completed</span></h2>
                 
                 <div class="input-wrapper">
-                    <input type="text" id="task-input" placeholder="Plant a new task..." autocomplete="off">
-                    <button id="add-btn">Plant</button>
+                    <input type="text" id="task-input" placeholder="Add a new task..." autocomplete="off">
+                    <button id="add-btn">Add</button>
                 </div>
 
-                <ul class="task-list" id="task-list">
-                    </ul>
+                <ul class="task-list" id="task-list"></ul>
             </section>
 
             <section class="panel panel-timer">
-                <h2>Focus Bloom</h2>
+                <h2>Focus Session</h2>
                 <div class="timer-wrapper">
                     <svg class="timer-svg" viewBox="0 0 220 220">
                         <circle class="timer-bg" cx="110" cy="110" r="100"></circle>
@@ -347,10 +356,18 @@
                 </div>
 
                 <div class="timer-controls">
-                    <button class="btn-action" id="toggle-timer">Begin</button>
-                    <button id="reset-timer">Reset</button>
+                    <div class="control-row">
+                        <button class="btn-action" id="toggle-timer">Begin</button>
+                        <button id="reset-timer">Reset</button>
+                    </div>
+                    <div class="control-row">
+                        <button class="btn-small" id="minus-five">-5 Min</button>
+                        <button class="btn-small" id="plus-five">+5 Min</button>
+                    </div>
+                    <div class="control-row">
+                        <button class="btn-text" id="undo-time-changes">Undo time changes</button>
+                    </div>
                 </div>
-                <div id="growth-stage">The soil is ready.</div>
             </section>
         </main>
     </div>
@@ -380,7 +397,7 @@
                 taskList.appendChild(li);
             });
             const doneCount = tasks.filter(t => t.done).length;
-            counter.textContent = `${doneCount} plucked`;
+            counter.textContent = `${doneCount} completed`;
         }
 
         function addTask() {
@@ -408,15 +425,20 @@
         taskInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') addTask(); });
         function cleanHTML(str) { return str.replace(/[&<>'"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m])); }
 
-        // --- BOTANICAL TIMER ARCHITECTURE ---
-        let duration = 25 * 60;
-        let timeRemaining = duration;
+        // --- TIMER ARCHITECTURE ---
+        const FACTORY_DEFAULT_TIME = 25 * 60;
+        let defaultDuration = FACTORY_DEFAULT_TIME; 
+        let timeRemaining = defaultDuration;
         let clockInterval = null;
+        let isTimerActive = false; 
+
         const ring = document.getElementById('timer-ring');
         const timeString = document.getElementById('time-string');
         const toggleTimerBtn = document.getElementById('toggle-timer');
         const resetTimerBtn = document.getElementById('reset-timer');
-        const growthStage = document.getElementById('growth-stage');
+        const plusFiveBtn = document.getElementById('plus-five');
+        const minusFiveBtn = document.getElementById('minus-five');
+        const undoTimeChangesBtn = document.getElementById('undo-time-changes');
         
         const circumference = 2 * Math.PI * 100;
 
@@ -425,16 +447,21 @@
             const secs = timeRemaining % 60;
             timeString.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
             
-            const offset = circumference - ((duration - timeRemaining) / duration * circumference);
-            ring.style.strokeDashoffset = offset;
+            const activeMax = isTimerActive ? Math.max(timeRemaining, defaultDuration) : defaultDuration;
+            const offset = circumference - ((activeMax - timeRemaining) / activeMax * circumference);
+            ring.style.strokeDashoffset = isNaN(offset) ? 0 : offset;
+        }
 
-            // Whimsical text changes based on session progress
-            const pct = (timeRemaining / duration) * 100;
-            if (pct === 100) growthStage.textContent = "The soil is ready.";
-            else if (pct > 75) growthStage.textContent = "A seed breaks open...";
-            else if (pct > 40) growthStage.textContent = "Sprouting upward into the light.";
-            else if (pct > 5) growthStage.textContent = "Leaves are forming smoothly.";
-            else growthStage.textContent = "Almost ready to bloom!";
+        function adjustTime(amountMinutes) {
+            const amountSeconds = amountMinutes * 60;
+            
+            if (clockInterval || isTimerActive) {
+                timeRemaining = Math.max(0, timeRemaining + amountSeconds);
+            } else {
+                defaultDuration = Math.max(60, defaultDuration + amountSeconds);
+                timeRemaining = defaultDuration;
+            }
+            updateClockDisplay();
         }
 
         function toggleClock() {
@@ -443,6 +470,7 @@
                 clockInterval = null;
                 toggleTimerBtn.textContent = 'Resume';
             } else {
+                isTimerActive = true; 
                 toggleTimerBtn.textContent = 'Pause';
                 clockInterval = setInterval(() => {
                     if(timeRemaining > 0) {
@@ -451,8 +479,8 @@
                     } else {
                         clearInterval(clockInterval);
                         clockInterval = null;
-                        growthStage.textContent = "Fully bloomed! Take a restful break.";
-                        alert("Your focus session has bloomed into a beautiful flower. Time to rest.");
+                        isTimerActive = false;
+                        alert("Focus session completed!");
                         resetClock();
                     }
                 }, 1000);
@@ -462,13 +490,27 @@
         function resetClock() {
             clearInterval(clockInterval);
             clockInterval = null;
-            timeRemaining = duration;
+            isTimerActive = false;
+            timeRemaining = defaultDuration;
+            toggleTimerBtn.textContent = 'Begin';
+            updateClockDisplay();
+        }
+
+        function undoAllTimeChanges() {
+            clearInterval(clockInterval);
+            clockInterval = null;
+            isTimerActive = false;
+            defaultDuration = FACTORY_DEFAULT_TIME;
+            timeRemaining = defaultDuration;
             toggleTimerBtn.textContent = 'Begin';
             updateClockDisplay();
         }
 
         toggleTimerBtn.addEventListener('click', toggleClock);
         resetTimerBtn.addEventListener('click', resetClock);
+        plusFiveBtn.addEventListener('click', () => adjustTime(5));
+        minusFiveBtn.addEventListener('click', () => adjustTime(-5));
+        undoTimeChangesBtn.addEventListener('click', undoAllTimeChanges);
 
         // Init
         render();
