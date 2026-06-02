@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nomad Notes</title>
+    <style>
+        :root {
+            --bg-cream: #faf6f0;
+            --paper-white: #ffffff;
+            --moss-green: #4a5d4e;
+            --sage: #8f9f8f;
+            --terracotta: #d98a6c;
+            --charcoal: #2d332f;
+            --organic-radius-1: 30px 15px 40px 20px;
+            --organic-radius-2: 20px 40px 25px 35px;
+            --hand-font: 'Georgia', serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--hand-font);
+            background-color: var(--bg-cream);
+            color: var(--charcoal);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            position: relative;
+            background-image: 
+                radial-gradient(var(--sage) 0.5px, transparent 0.5px), 
+                radial-gradient(var(--sage) 0.5px, var(--bg-cream) 0.5px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            font-weight: 400;
+            color: var(--moss-green);
+            font-style: italic;
+            letter-spacing: -1px;
+            display: inline-block;
+            position: relative;
+        }
+
+        header h1::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background: var(--terracotta);
+            border-radius: 50%;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--sage);
+            margin-top: 0.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Layout Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 0.8fr 1.2fr;
+            }
+        }
+
+        .panel {
+            background: var(--paper-white);
+            padding: 2.5rem;
+            box-shadow: 0 12px 32px rgba(74, 93, 78, 0.06);
+            border: 2px solid var(--moss-green);
+            transition: transform 0.3s ease;
+            position: relative;
+            height: max-content;
+        }
+
+        .panel-composer {
+            border-radius: var(--organic-radius-1);
+        }
+
+        .panel-stream {
+            border-radius: var(--organic-radius-2);
+        }
+
+        .panel:hover {
+            transform: scale(1.005) rotate(0.2deg);
+        }
+
+        h2 {
+            font-weight: 400;
+            font-style: italic;
+            color: var(--moss-green);
+            margin-bottom: 1.5rem;
+            font-size: 1.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Form Controls */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            border: 2px solid var(--sage);
+            border-radius: 20px 10px 20px 15px;
+            font-family: var(--hand-font);
+            font-size: 1rem;
+            background: transparent;
+            color: var(--charcoal);
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            border-radius: 15px 25px 15px 20px;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path fill='%234a5d4e' d='M0 3l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 1.2rem center;
+            border-radius: 12px 20px 12px 15px;
+            cursor: pointer;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--terracotta);
+        }
+
+        button {
+            font-family: var(--hand-font);
+            cursor: pointer;
+            padding: 0.8rem 1.5rem;
+            border: 2px solid var(--moss-green);
+            background: var(--paper-white);
+            color: var(--moss-green);
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 12px 25px 12px 20px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        button:hover {
+            background: var(--moss-green);
+            color: var(--paper-white);
+            transform: translateY(-2px);
+        }
+
+        .btn-action {
+            background: var(--terracotta);
+            color: white;
+            border-color: var(--terracotta);
+            width: 100%;
+        }
+        .btn-action:hover {
+            background: #c27355;
+            border-color: #c27355;
+        }
+
+        /* Filter Pills */
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed var(--sage);
+        }
+
+        .pill {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.85rem;
+            border: 1px solid var(--sage);
+            border-radius: 15px 8px 12px 10px;
+            cursor: pointer;
+            background: transparent;
+            color: var(--charcoal);
+            transition: all 0.2s ease;
+        }
+        .pill.active, .pill:hover {
+            background: var(--moss-green);
+            color: white;
+            border-color: var(--moss-green);
+        }
+
+        /* Notes Notebook Stream */
+        .notes-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .note-card {
+            padding: 1.5rem 0;
+            border-bottom: 1px dashed var(--sage);
+            animation: growIn 0.4s ease;
+            position: relative;
+        }
+
+        .note-card:last-child {
+            border-bottom: none;
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .note-title {
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: var(--moss-green);
+            font-style: italic;
+        }
+
+        .note-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vibe-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--bg-cream);
+            padding: 0.2rem 0.6rem;
+            border-radius: 8px 4px 8px 4px;
+            color: var(--moss-green);
+            border: 1px solid var(--sage);
+        }
+
+        .note-body {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: var(--charcoal);
+            white-space: pre-wrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .note-body.expanded {
+            display: block;
+            overflow: visible;
+            -webkit-line-clamp: unset;
+        }
+
+        .btn-delete-note {
+            border: none;
+            background: none;
+            color: var(--sage);
+            font-size: 1.1rem;
+            padding: 0 0.5rem;
+        }
+        .btn-delete-note:hover {
+            color: var(--terracotta);
+            background: none;
+            transform: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--sage);
+            font-style: italic;
+            padding: 2rem 0;
+        }
+
+        @keyframes growIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Nomad Notes</h1>
+            <div class="subtitle" style="padding-top:8px;">Capture your thoughts and current vibes</div>
+        </header>
+
+        <main class="dashboard-grid">
+            <section class="panel panel-composer">
+                <h2>Write</h2>
+                <div class="input-group">
+                    <input type="text" id="note-title" placeholder="Title your thought..." autocomplete="off">
+                    <textarea id="note-body" placeholder="What's on your mind?"></textarea>
+                    <select id="note-vibe">
+                        <option value="calm">Calm Vibe</option>
+                        <option value="productive">Productive Vibe</option>
+                        <option value="wandering">Wandering Vibe</option>
+                        <option value="heavy">Heavy Vibe</option>
+                    </select>
+                </div>
+                <button class="btn-action" id="save-note-btn">Save Entry</button>
+            </section>
+
+            <section class="panel panel-stream">
+                <h2>Notebook</h2>
+                
+                <div class="filter-row" id="filter-container">
+                    <button class="pill active" data-filter="all">All Thoughts</button>
+                    <button class="pill" data-filter="calm">Calm</button>
+                    <button class="pill" data-filter="productive">Productive</button>
+                    <button class="pill" data-filter="wandering">Wandering</button>
+                    <button class="pill" data-filter="heavy">Heavy</button>
+                </div>
+
+                <div class="notes-stream" id="notes-wrapper">
+                    </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        let notes = JSON.parse(localStorage.getItem('nomad_notes')) || [];
+        let currentFilter = 'all';
+
+        const noteTitle = document.getElementById('note-title');
+        const noteBody = document.getElementById('note-body');
+        const noteVibe = document.getElementById('note-vibe');
+        const saveNoteBtn = document.getElementById('save-note-btn');
+        const notesWrapper = document.getElementById('notes-wrapper');
+        const filterContainer = document.getElementById('filter-container');
+
+        function renderNotes() {
+            localStorage.setItem('nomad_notes', JSON.stringify(notes));
+            notesWrapper.innerHTML = '';
+
+            const filteredNotes = notes.filter(note => currentFilter === 'all' || note.vibe === currentFilter);
+
+            if (filteredNotes.length === 0) {
+                notesWrapper.innerHTML = `<div class="empty-state">This part of the notebook is completely open...</div>`;
+                return;
+            }
+
+            // Show newest notes first
+            filteredNotes.slice().reverse().forEach((note) => {
+                // Find original index to maintain accurate deletion targets
+                const originalIndex = notes.indexOf(note); 
+
+                const div = document.createElement('div');
+                div.className = 'note-card';
+                div.innerHTML = `
+                    <div class="note-header">
+                        <span class="note-title">${cleanHTML(note.title || 'Untitled Thought')}</span>
+                        <div class="note-meta">
+                            <span class="vibe-tag">${note.vibe}</span>
+                            <button class="btn-delete-note" data-id="${originalIndex}">✕</button>
+                        </div>
+                    </div>
+                    <div class="note-body" onclick="this.classList.toggle('expanded')" title="Click to unfold thought">${cleanHTML(note.body)}</div>
+                `;
+                notesWrapper.appendChild(div);
+            });
+        }
+
+        function saveNote() {
+            const title = noteTitle.value.trim();
+            const body = noteBody.value.trim();
+            const vibe = noteVibe.value;
+
+            if (!body) {
+                alert("Please write something down before saving.");
+                return;
+            }
+
+            notes.push({ title, body, vibe });
+            
+            // Reset input values
+            noteTitle.value = '';
+            noteBody.value = '';
+            noteVibe.value = 'calm';
+
+            renderNotes();
+        }
+
+        // Handle deletions and handling filter selections
+        notesWrapper.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-delete-note')) {
+                const id = e.target.dataset.id;
+                notes.splice(id, 1);
+                renderNotes();
+            }
+        });
+
+        filterContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('pill')) {
+                document.querySelectorAll('.filter-row .pill').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                currentFilter = e.target.dataset.filter;
+                renderNotes();
+            }
+        });
+
+        saveNoteBtn.addEventListener('click', saveNote);
+        function cleanHTML(str) { return str.replace(/[&<>'"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m])); }
+
+        // Initial paint
+        renderNotes();
+    </script>
+</body>
+</html>
