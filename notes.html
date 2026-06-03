@@ -254,10 +254,14 @@
             color: var(--terracotta);
         }
 
+        /* --- RULED LINE GRAPHICS WORKSPACE --- */
         .scrolling-paper-frame {
             flex: 1;
             position: relative;
             overflow-y: auto;
+            background-image: linear-gradient(rgba(143, 159, 143, 0.25) 1px, transparent 1px);
+            background-size: 100% var(--line-height);
+            background-attachment: local;
         }
 
         div.rich-editor-canvas {
@@ -268,10 +272,10 @@
             background: transparent;
             border: none;
             outline: none;
-            padding-top: 2px;
-            background-image: linear-gradient(rgba(143, 159, 143, 0.25) 1px, transparent 1px);
-            background-size: 100% var(--line-height);
             white-space: pre-wrap;
+            font-size: 16px;
+            line-height: var(--line-height);
+            padding-top: 4px;
         }
 
         /* --- THEMED CUSTOM POPUP MODAL DIALOGS --- */
@@ -377,7 +381,7 @@
             border: 2px solid var(--moss-green);
         }
 
-        /* --- DESIGN STYLE 1: ORIGINAL JOURNAL MODE (ORANGE ACCENTS RESTORED) --- */
+        /* --- DESIGN STYLE 1: ORIGINAL JOURNAL MODE --- */
         body:not(.binder-mode-active) {
             padding: 1.5rem;
         }
@@ -485,10 +489,6 @@
             font-size: 2.2rem;
             color: var(--moss-green);
             padding-bottom: 0.5rem;
-        }
-
-        body:not(.binder-mode-active) div.rich-editor-canvas {
-            font-size: 16px;
         }
 
 
@@ -600,7 +600,9 @@
         }
 
         body.binder-mode-active div.rich-editor-canvas {
-            font-size: 18px;
+            font-size: 16px;
+            line-height: var(--line-height);
+            padding-top: 22px;
         }
 
         @media (max-width: 768px) {
@@ -871,7 +873,7 @@
                         const totalValidEntriesCount = extractedData.filter(item => item && typeof item === 'object' && 'body' in item && 'title' in item).length;
                         
                         if (totalValidEntriesCount === 0 && extractedData.length > 0) {
-                            throw new Error("Invalid structure layout parsing payload validation parameters.");
+                            throw new Error("Invalid structure structure profile validation failure.");
                         }
 
                         triggerCustomPopup(
@@ -923,13 +925,13 @@
                         );
                     } 
                     else {
-                        throw new Error("Unrecognized asset schema layout payload variables mismatch error.");
+                        throw new Error("Unrecognized payload variables mismatch error.");
                     }
 
                 } catch (err) {
                     triggerCustomPopup(
                         "Import Error",
-                        "The selected file is not a valid Nomad Notes JSON layout architecture structure template format configuration script profile.",
+                        "The selected file is not a valid Nomad Notes JSON layout architecture structure template format script profile.",
                         [{ label: "Close Error Diagnostic Display Window", isPrimary: true }]
                     );
                 }
@@ -1030,7 +1032,6 @@
                 const targetPage = journalPages.find(p => p.id === targetId);
                 const displayTitle = (targetPage && targetPage.title.trim()) ? targetPage.title : 'Untitled Page';
 
-                // Trigger custom pop-up validation for deleting a note
                 triggerCustomPopup(
                     "Delete Page",
                     `Are you sure you want to permanently delete "${displayTitle}"? This action cannot be undone.`,
