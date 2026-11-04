@@ -40,7 +40,7 @@ python3 -m http.server 8080 # or another port of your choice, you can pretty muc
 ```
 Open the following link/url (you may have to change the number if you chose a different port): [localhost:8080](https://localhost:8080) <br>
 <br>
-If you know that you need to run all the above commands, / have not already done them, here is the entire single-paste command:
+If you know that you need to run all the above commands, / have not already done them, many people have homebrew already, it is ommitted by being commented out, if you need it, you can remove the first hashtag making it a useable command. Here is the entire single-paste command:
 
 ```bash
 git clone "https://github.com/ColaCaine/nomad.git"
