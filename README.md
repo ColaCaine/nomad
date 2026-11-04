@@ -11,3 +11,31 @@ If you plan on clearing your browser cache, export first.
 
 License:
 See MIT license.
+
+<br>
+<br>
+<br>
+Self Hosting:
+<br>
+Clone the Repo:
+
+```bash
+git clone "https://github.com/ColaCaine/nomad.git"
+```
+Install Homebrew:
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" #Install Homebrew
+```
+Install Python dependency:
+```bash
+brew install python3
+```
+Enter Nomad:
+```bash
+cd nomad
+```
+Begin hosting via Python:
+```bash
+python -m http.server 8080 # or another port of your choice, you can pretty much put whatever, 8000, 8800, 1200, whatever, this is so you can have more than one port open to host multiple things.
+```
+Open your web browser and go to the following url: [localhost:8080](https://localhost:8080)
