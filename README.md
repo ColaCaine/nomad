@@ -36,6 +36,16 @@ cd nomad
 ```
 Begin hosting via Python:
 ```bash
-python -m http.server 8080 # or another port of your choice, you can pretty much put whatever, 8000, 8800, 1200, whatever, this is so you can have more than one port open to host multiple things.
+python3 -m http.server 8080 # or another port of your choice, you can pretty much put whatever, 8000, 8800, 1200, whatever, this is so you can have more than one port open to host multiple things.
 ```
-Open the following link/url (you may have to change the number if you chose a different port): [localhost:8080](https://localhost:8080)
+Open the following link/url (you may have to change the number if you chose a different port): [localhost:8080](https://localhost:8080) <br>
+<br>
+If you know that you need to run all the above commands, / have not already done them, here is the entire single-paste command:
+
+```bash
+git clone "https://github.com/ColaCaine/nomad.git"
+#/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" #Install Homebrew -- Remove the first hashtag if you need to run this command/do not have Homebrew installed.
+brew install python3
+cd nomad
+python3 -m http.server 8080
+```
