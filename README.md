@@ -38,4 +38,4 @@ Begin hosting via Python:
 ```bash
 python -m http.server 8080 # or another port of your choice, you can pretty much put whatever, 8000, 8800, 1200, whatever, this is so you can have more than one port open to host multiple things.
 ```
-Open your web browser and go to the following url: [localhost:8080](https://localhost:8080)
+Open the following link/url (you may have to change the number if you chose a different port): [localhost:8080](https://localhost:8080)
