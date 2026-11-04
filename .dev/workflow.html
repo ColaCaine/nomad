@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f3eb">
+    <title>Web Development Workflow</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --canvas: #f6f3eb;
+            --paper: #fffefa;
+            --ink: #25342f;
+            --muted: #64736a;
+            --line: #d9ded3;
+            --green: #476b57;
+            --green-soft: #e8f0e9;
+            --clay: #b86145;
+            --clay-soft: #f7e9e2;
+            --gold: #9a7837;
+            --gold-soft: #f5efdE;
+            --blue: #536f86;
+            --blue-soft: #e9eff4;
+            --shadow: 0 16px 42px rgba(37, 52, 47, .08);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+        body, html {
+            overflow:hidden;
+            cursor:default;
+            /* Apply to the entire body or a specific class */
+
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none;   /* Safari */
+            -khtml-user-select: none;    /* Konqueror HTML */
+            -moz-user-select: none;      /* Old versions of Firefox */
+            -ms-user-select: none;       /* Internet Explorer/Edge */
+            user-select: none;           /* Standard syntax */
+        }
+        body {
+            min-width: 320px;
+            min-height: 100vh;
+            margin: 0;
+            padding: clamp(20px, 5vw, 72px);
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 1px 1px, rgba(71, 107, 87, .12) 1px, transparent 1.2px) 0 0 / 24px 24px,
+                var(--canvas);
+        }
+
+        main {
+            width: min(1120px, 100%);
+            margin: 0 auto;
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 0 12px;
+            color: var(--green);
+            font-size: .75rem;
+            font-weight: 750;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+        }
+
+        .eyebrow::before {
+            width: 22px;
+            height: 2px;
+            background: var(--clay);
+            content: "";
+        }
+
+        h1 {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 500;
+            letter-spacing: -.045em;
+            line-height: 1.05;
+        }
+
+        .intro {
+            max-width: 620px;
+            margin: 16px 0 36px;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .workflow {
+            padding: clamp(16px, 3vw, 30px);
+            border: 1px solid rgba(71, 107, 87, .17);
+            border-radius: 24px;
+            background: rgba(255, 254, 250, .88);
+            box-shadow: var(--shadow);
+        }
+
+        .workflow-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .workflow-heading h2 {
+            margin: 0;
+            font-size: .92rem;
+            font-weight: 700;
+            letter-spacing: .02em;
+        }
+
+        .loop-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--muted);
+            font-size: .78rem;
+        }
+
+        .loop-hint span {
+            color: var(--clay);
+            font-size: 1rem;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            align-items: stretch;
+            gap: 28px;
+        }
+
+        .step {
+            position: relative;
+            min-width: 0;
+            padding: 18px 16px 17px;
+            border: 1px solid var(--line);
+            border-top: 3px solid var(--accent);
+            border-radius: 13px;
+            background: var(--paper);
+        }
+
+        .step:not(:last-child)::after {
+            position: absolute;
+            z-index: 1;
+            top: 50%;
+            right: -23px;
+            width: 18px;
+            color: #94a097;
+            content: "→";
+            font-size: 1.15rem;
+            font-weight: 500;
+            text-align: center;
+            transform: translateY(-50%);
+        }
+
+        .step-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 17px;
+        }
+
+        .step-icon {
+            display: grid;
+            width: 34px;
+            height: 34px;
+            place-items: center;
+            border-radius: 10px;
+            background: var(--tint);
+            color: var(--accent);
+            font-size: 1rem;
+            font-weight: 750;
+        }
+
+        .step-number {
+            color: #94a097;
+            font-size: .68rem;
+            font-weight: 750;
+            letter-spacing: .1em;
+        }
+
+        .step h3 {
+            margin: 0 0 8px;
+            font-size: .98rem;
+            line-height: 1.3;
+        }
+
+        .step p {
+            min-height: 4.8em;
+            margin: 0;
+            color: var(--muted);
+            font-size: .79rem;
+            line-height: 1.55;
+        }
+
+        .deliverable {
+            display: block;
+            margin-top: 16px;
+            padding-top: 11px;
+            border-top: 1px solid #edf0e9;
+            color: var(--accent);
+            font-size: .68rem;
+            font-weight: 750;
+            letter-spacing: .025em;
+            line-height: 1.4;
+        }
+
+        .define { --accent: var(--gold); --tint: var(--gold-soft); }
+        .design { --accent: var(--blue); --tint: var(--blue-soft); }
+        .build { --accent: var(--green); --tint: var(--green-soft); }
+        .verify { --accent: var(--clay); --tint: var(--clay-soft); }
+        .release { --accent: #687251; --tint: #eef0e5; }
+
+        .feedback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: fit-content;
+            margin: 22px auto 0;
+            padding: 10px 16px;
+            border: 1px dashed #d6a18e;
+            border-radius: 999px;
+            background: #fff9f5;
+            color: #80523e;
+            font-size: .78rem;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        .feedback strong { color: var(--clay); }
+        .feedback-arrow { font-size: 1rem; }
+
+        .principles {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .principle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 15px;
+            border: 1px solid rgba(71, 107, 87, .13);
+            border-radius: 12px;
+            background: rgba(255, 254, 250, .68);
+            color: var(--muted);
+            font-size: .78rem;
+            line-height: 1.4;
+        }
+
+        .principle b {
+            flex: 0 0 auto;
+            color: var(--green);
+            font-size: .9rem;
+        }
+
+        @media (max-width: 820px) {
+            .steps {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .step {
+                display: grid;
+                grid-template-columns: 42px minmax(0, 1fr);
+                column-gap: 12px;
+                padding: 14px;
+            }
+
+            .step:not(:last-child)::after {
+                top: auto;
+                right: auto;
+                bottom: -16px;
+                left: 27px;
+                width: auto;
+                content: "↓";
+                transform: none;
+            }
+
+            .step-top {
+                grid-row: span 3;
+                align-items: flex-start;
+                flex-direction: column;
+                margin: 0;
+            }
+
+            .step h3 { align-self: end; }
+            .step p { min-height: 0; }
+            .deliverable { margin-top: 9px; }
+            .principles { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 24px 16px; }
+            .workflow-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+            .feedback {
+                width: 100%;
+                border-radius: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <p class="eyebrow">A practical team guide</p>
+        <h1>From idea to<br>working website.</h1>
+        <p class="intro">A steady loop for building web software: get clear on the problem, make a small change, prove it works, and ship with confidence.</p>
+
+        <section class="workflow" aria-labelledby="workflow-title">
+            <div class="workflow-heading">
+                <h2 id="workflow-title">THE DEVELOPMENT LOOP</h2>
+                <span class="loop-hint"><span aria-hidden="true">↶</span> Learn and iterate</span>
+            </div>
+
+            <div class="steps">
+                <article class="step define">
+                    <div class="step-top">
+                        <span class="step-icon" aria-hidden="true">⌕</span>
+                        <span class="step-number">01</span>
+                    </div>
+                    <h3>Understand</h3>
+                    <p>Clarify the user, the problem, and what “done” should look like.</p>
+                    <span class="deliverable">OUTCOME · Clear scope</span>
+                </article>
+
+                <article class="step design">
+                    <div class="step-top">
+                        <span class="step-icon" aria-hidden="true">◇</span>
+                        <span class="step-number">02</span>
+                    </div>
+                    <h3>Explore &amp; plan</h3>
+                    <p>Inspect the codebase, identify constraints, and choose a small approach.</p>
+                    <span class="deliverable">OUTCOME · Small plan</span>
+                </article>
+
+                <article class="step build">
+                    <div class="step-top">
+                        <span class="step-icon" aria-hidden="true">⌘</span>
+                        <span class="step-number">03</span>
+                    </div>
+                    <h3>Implement</h3>
+                    <p>Make the focused change, following existing patterns and keeping it reviewable.</p>
+                    <span class="deliverable">OUTCOME · Working change</span>
+                </article>
+
+                <article class="step verify">
+                    <div class="step-top">
+                        <span class="step-icon" aria-hidden="true">✓</span>
+                        <span class="step-number">04</span>
+                    </div>
+                    <h3>Verify</h3>
+                    <p>Run relevant tests, check edge cases, and review the result in context.</p>
+                    <span class="deliverable">OUTCOME · Proven behavior</span>
+                </article>
+
+                <article class="step release">
+                    <div class="step-top">
+                        <span class="step-icon" aria-hidden="true">↗</span>
+                        <span class="step-number">05</span>
+                    </div>
+                    <h3>Review &amp; ship</h3>
+                    <p>Share the change, document what matters, and monitor after release.</p>
+                    <span class="deliverable">OUTCOME · Useful release</span>
+                </article>
+            </div>
+
+            <div class="feedback">
+                <span class="feedback-arrow" aria-hidden="true">↶</span>
+                <span><strong>Checks fail?</strong> Use what you learned to adjust the plan or implementation, then verify again.</span>
+            </div>
+        </section>
+
+        <section class="principles" aria-label="Workflow principles">
+            <div class="principle"><b>01</b><span>Keep each change small and easy to explain.</span></div>
+            <div class="principle"><b>02</b><span>Automate repeatable checks; inspect the user experience.</span></div>
+            <div class="principle"><b>03</b><span>Ship only when the outcome matches the original goal.</span></div>
+        </section>
+    </main>
+</body>
+</html>
